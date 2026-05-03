@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        yt: {
+                            black: '#0f0f0f',
+                            header: '#0f0f0f',
+                            sidebar: '#0f0f0f',
+                            hover: '#272727',
+                            text: '#f1f1f1',
+                            muted: '#aaaaaa'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #717171;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a0a0a0;
+        }
+        
+        /* Hide scrollbar for category list */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        body {
+            background-color: #0f0f0f;
+            color: #f1f1f1;
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen overflow-hidden text-yt-text">
+    <!-- Header -->
+    <header class="flex items-center justify-between px-4 py-2 h-14 shrink-0 bg-yt-header fixed w-full z-20 top-0">
+        <div class="flex items-center gap-4">
+            <button class="p-2 hover:bg-yt-hover rounded-full hidden sm:block">
+                <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M21 6H3V5h18v1zm0 5H3v1h18v-1zm0 6H3v1h18v-1z"></path></svg>
+            </button>
+            <div class="flex items-center gap-1 cursor-pointer">
+                <svg class="w-8 h-8 text-red-600" viewBox="0 0 24 24" fill="currentColor"><path d="M21.582 6.186a2.506 2.506 0 0 0-1.762-1.766C18.265 4 12 4 12 4s-6.264 0-7.82.42a2.506 2.506 0 0 0-1.761 1.766C2 7.74 2 12 2 12s0 4.26.419 5.814a2.506 2.506 0 0 0 1.761 1.766C5.736 20 12 20 12 20s6.265 0 7.82-.42a2.506 2.506 0 0 0 1.762-1.766C22 16.26 22 12 22 12s0-4.26-.418-5.814zM9.99 15.474v-6.948L15.955 12l-5.965 3.474z"></path></svg>
+                <span class="text-xl font-bold tracking-tighter" style="font-family: 'Oswald', sans-serif;">YouTube</span>
+            </div>
+        </div>
+        
+        <div class="hidden sm:flex flex-1 max-w-[720px] ml-10 items-center gap-4">
+            <div class="flex flex-1 items-center">
+                <div class="flex w-full items-center border border-[#303030] rounded-l-full bg-[#121212] px-4 py-1.5 focus-within:border-[#1c62b9] ml-8">
+                    <svg class="w-5 h-5 fill-yt-muted mr-2" viewBox="0 0 24 24"><path d="M20.87,20.17l-5.59-5.59C16.35,13.35,17,11.75,17,10c0-3.87-3.13-7-7-7s-7,3.13-7,7s3.13,7,7,7c1.75,0,3.35-0.65,4.58-1.71 l5.59,5.59L20.87,20.17z M10,16c-3.31,0-6-2.69-6-6s2.69-6,6-6s6,2.69,6,6S13.31,16,10,16z"></path></svg>
+                    <input type="text" placeholder="Search" class="w-full bg-transparent outline-none text-yt-text text-base">
+                </div>
+                <button class="bg-[#222222] border border-l-0 border-[#303030] rounded-r-full px-5 py-1.5 hover:bg-[#303030]">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M20.87,20.17l-5.59-5.59C16.35,13.35,17,11.75,17,10c0-3.87-3.13-7-7-7s-7,3.13-7,7s3.13,7,7,7c1.75,0,3.35-0.65,4.58-1.71 l5.59,5.59L20.87,20.17z M10,16c-3.31,0-6-2.69-6-6s2.69-6,6-6s6,2.69,6,6S13.31,16,10,16z"></path></svg>
+                </button>
+            </div>
+            <button class="bg-[#181818] p-2.5 hover:bg-[#303030] rounded-full">
+                <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M12 3c-1.66 0-3 1.34-3 3v6c0 1.66 1.34 3 3 3s3-1.34 3-3V6c0-1.66-1.34-3-3-3zm5 9h-1.4c0 2-1.6 3.6-3.6 3.6s-3.6-1.6-3.6-3.6H7c0 2.5 1.9 4.6 4.3 4.9V21h1.4v-4.1c2.4-.3 4.3-2.4 4.3-4.9z"></path></svg>
+            </button>
+        </div>
+
+        <div class="flex items-center gap-1 sm:gap-3 md:gap-5">
+            <button class="p-2 hover:bg-yt-hover rounded-full sm:hidden">
+                <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M20.87,20.17l-5.59-5.59C16.35,13.35,17,11.75,17,10c0-3.87-3.13-7-7-7s-7,3.13-7,7s3.13,7,7,7c1.75,0,3.35-0.65,4.58-1.71 l5.59,5.59L20.87,20.17z M10,16c-3.31,0-6-2.69-6-6s2.69-6,6-6s6,2.69,6,6S13.31,16,10,16z"></path></svg>
+            </button>
+            <button class="p-2 hover:bg-yt-hover rounded-full hidden sm:block">
+                <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M14 13h-3v3H9v-3H6v-2h3V8h2v3h3v2zm3-7H3v12h14v-6.39l4 1.83V8.56l-4 1.83V6m2-2v16l-6-2.75V22H1V4h14v2.75L21 4z"></path></svg>
+            </button>
+            <button class="p-2 hover:bg-yt-hover rounded-full relative">
+                <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M10 20h4c0 1.1-.9 2-2 2s-2-.9-2-2zm10-2.65V19H4v-1.65l2-1.88v-5.15C6 7.4 7.56 5.1 10 4.34v-.38c0-1.42 1.49-2.5 2.99-1.76.65.32 1.01 1.03 1.01 1.76v.39c2.44.75 4 3.06 4 5.98v5.15l2 1.87zm-1.56-.63-1.44-1.35v-5.04c0-2.43-1.5-4.32-3.8-4.88-.34-.08-.66-.18-1-.24v-.7c0-.28-.22-.5-.5-.5s-.5.22-.5.5v.71c-.34.06-.66.16-1 .24-2.3.56-3.8 2.45-3.8 4.88v5.04l-1.44 1.35V18h13.5v-1.28z"></path></svg>
+                <div class="absolute top-1 right-1 bg-red-600 text-white text-[10px] font-bold px-1 rounded-full border border-yt-header">9+</div>
+            </button>
+            <button class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold overflow-hidden ml-2 sm:ml-0">
+                U
+            </button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 mt-14 overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-[72px] lg:w-[240px] flex-shrink-0 flex flex-col bg-yt-sidebar overflow-y-auto hover:overflow-y-scroll pb-4 px-3 hidden sm:flex">
+            <div class="flex flex-col mt-3 w-full">
+                <a href="#" class="flex lg:flex-row flex-col items-center lg:items-start lg:justify-start justify-center gap-1 lg:gap-5 px-1 lg:px-3 py-4 lg:py-2.5 bg-yt-hover rounded-lg text-white font-medium">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M4 21V10.08l8-6.96 8 6.96V21h-6v-6h-4v6H4z"></path></svg>
+                    <span class="text-[10px] lg:text-sm mt-1 lg:mt-0.5">Home</span>
+                </a>
+                <a href="#" class="flex lg:flex-row flex-col items-center lg:items-start lg:justify-start justify-center gap-1 lg:gap-5 px-1 lg:px-3 py-4 lg:py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.33-1.2-.5L18 9.06c1.84-.96 2.53-3.23 1.56-5.06s-3.24-2.53-5.07-1.56L6 6.94c-1.29.68-2.07 2.04-2 3.49.06 1.42.94 2.66 2.25 3.16.32.12.72.26 1.14.4l-1.2.49c-1.84.96-2.53 3.23-1.56 5.06s3.24 2.53 5.07 1.56l8.5-4.5c1.29-.68 2.06-2.04 1.99-3.49-.06-1.42-.94-2.66-2.25-3.16l-1.15-.4zM14.07 21l-8.5-4.5c-1.34-.71-1.85-2.34-1.14-3.68.71-1.35 2.34-1.86 3.68-1.15l1.83.76.35.15-.17-.36-1.14-2.43-.15-.31.32-.12c.98-.38 1.63-1.28 1.65-2.32.02-1.04-.6-1.98-1.55-2.4l-1.84-.81L6.96 8.33c-1.34-.71-1.85-2.34-1.14-3.68.71-1.35 2.34-1.86 3.68-1.15l8.5 4.5c1.34.71 1.85 2.34 1.14 3.68-.71 1.35-2.34 1.86-3.68 1.15l-1.83-.76-.35-.15.17.36 1.14 2.43.15.31-.32.12c-.98.38-1.63 1.28-1.65 2.32-.02 1.04.6 1.98 1.55 2.4l1.84.81 1.44-.61c1.34.71 1.85 2.34 1.14 3.68-.71 1.35-2.34 1.86-3.68 1.15z"></path></svg>
+                    <span class="text-[10px] lg:text-sm mt-1 lg:mt-0.5 text-ellipsis overflow-hidden">Shorts</span>
+                </a>
+                <a href="#" class="flex lg:flex-row flex-col items-center lg:items-start lg:justify-start justify-center gap-1 lg:gap-5 px-1 lg:px-3 py-4 lg:py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M10 18v-6l5 3-5 3zm7-15H7v1h10V3zm3 3H4v1h16V6zm2 3H2v12h20V9zM3 10h18v10H3V10z"></path></svg>
+                    <span class="text-[10px] lg:text-sm mt-1 lg:mt-0.5 text-ellipsis overflow-hidden">Subscriptions</span>
+                </a>
+            </div>
+            
+            <hr class="border-[#3f3f3f] my-3 hidden lg:block mx-3">
+
+            <div class="hidden lg:flex flex-col w-full">
+                <a href="#" class="flex items-center gap-2 px-3 py-2.5 hover:bg-yt-hover rounded-lg text-white font-medium text-base mb-1">
+                    You <svg class="w-4 h-4 fill-white" viewBox="0 0 24 24"><path d="m9.4 18.4-.7-.7 5.6-5.6-5.7-5.7.7-.7 6.4 6.4-6.3 6.3z"></path></svg>
+                </a>
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M11 7l6 3.5L11 14V7zm7 13H4v-2h14v2zm2-4H2V3h18v13zM3 4v11h16V4H3z"></path></svg>
+                    <span class="text-sm">Your channel</span>
+                </a>
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M14.97 16.95 10 13.87V7h2v5.76l4.03 2.49-1.06 1.7zM22 12c0 5.51-4.49 10-10 10S2 17.51 2 12h1c0 4.96 4.04 9 9 9s9-4.04 9-9-4.04-9-9-9C8.81 3 5.92 4.64 4.28 7.38c-.11.18-.22.37-.31.56L3.94 7H3V11h4V10H4.9c.14-.3.29-.59.46-.87C7.26 6.03 10.5 4.83 13.67 5.7c3.17.88 5.48 3.58 5.75 6.83.27 3.25-1.52 6.27-4.52 7.62-3 .1.35-1.52-5.73-4.13-6.91-2.61-1.18-5.91-.01-8.15 2.15l-.71.71C2.55 13.56 2.05 10 3.32 6.94c1.27-3.06 4.38-4.94 7.68-4.94C16.52 2 21 6.48 21 12z" fill-rule="evenodd"></path></svg>
+                    <span class="text-sm">History</span>
+                </a>
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M10 8l6 4-6 4V8zm11-5v18H3V3h18zm-1 1H4v16h16V4z"></path></svg>
+                    <span class="text-sm">Your videos</span>
+                </a>
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M14.97 16.95 10 13.87V7h2v5.76l4.03 2.49-1.06 1.7zM12 3c-4.96 0-9 4.04-9 9s4.04 9 9 9 9-4.04 9-9-4.04-9-9-9m0-1c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2z"></path></svg>
+                    <span class="text-sm">Watch later</span>
+                </a>
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M18.77,11h-4.23l1.52-4.94C16.38,5.03,15.54,4,14.38,4c-0.58,0-1.14,0.24-1.52,0.65L7,11H3v10h4h1h9.43 c1.06,0,1.98-0.67,2.19-1.61l1.34-6C21.23,12.15,20.18,11,18.77,11z M7,20H4v-8h3V20z M19.98,13.17l-1.34,6 C18.54,19.65,18.03,20,17.43,20H8v-8.61l5.6-6.06C13.84,5.09,14.11,5,14.38,5c0.26,0,0.5,0.11,0.63,0.3 c0.07,0.1,0.15,0.26,0.09,0.47l-1.52,4.94L13.18,12h1.35h4.23c0.41,0,0.8,0.17,1.03,0.46C19.92,12.61,20.05,12.86,19.98,13.17z"></path></svg>
+                    <span class="text-sm">Liked videos</span>
+                </a>
+            </div>
+            
+            <hr class="border-[#3f3f3f] my-3 hidden lg:block mx-3">
+            
+            <div class="hidden lg:flex flex-col w-full">
+                <h3 class="px-3 py-1 text-base font-medium mb-1">Subscriptions</h3>
+                <!-- Subscription list placeholder -->
+                <a href="#" class="flex items-center gap-5 px-3 py-2.5 hover:bg-yt-hover rounded-lg text-white">
+                    <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-xs">H</div>
+                    <span class="text-sm truncate">Hitesh Choudhary</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-yt-black relative pb-20 sm:pb-0">
+            <!-- Categories -->
+            <div class="sticky top-0 bg-yt-black bg-opacity-95 backdrop-blur-sm z-10 py-3 px-4 md:px-6 flex gap-3 overflow-x-auto no-scrollbar border-b border-transparent">
+                <button class="px-3 py-1.5 bg-white text-black rounded-lg text-sm font-medium whitespace-nowrap">All</button>
+                <button class="px-3 py-1.5 bg-[#272727] hover:bg-[#3f3f3f] text-white rounded-lg text-sm font-medium whitespace-nowrap transition">Gaming</button>
+                <button class="px-3 py-1.5 bg-[#272727] hover:bg-[#3f3f3f] text-white rounded-lg text-sm font-medium whitespace-nowrap transition">Programming</button>
+                <button class="px-3 py-1.5 bg-[#272727] hover:bg-[#3f3f3f] text-white rounded-lg text-sm font-medium whitespace-nowrap transition">Music</button>
+                <button class="px-3 py-1.5 bg-[#272727] hover:bg-[#3f3f3f] text-white rounded-lg text-sm font-medium whitespace-nowrap transition">Live</button>
+                <button class="px-3 py-1.5 bg-[#272727] hover:bg-[#3f3f3f] text-white rounded-lg text-sm font-medium whitespace-nowrap transition">Podcasts</button>
+                <button class="px-3 py-1.5 bg-[#272727] hover:bg-[#3f3f3f] text-white rounded-lg text-sm font-medium whitespace-nowrap transition">Mixes</button>
+                <button class="px-3 py-1.5 bg-[#272727] hover:bg-[#3f3f3f] text-white rounded-lg text-sm font-medium whitespace-nowrap transition">Recently uploaded</button>
+            </div>
+
+            <!-- Video Grid -->
+            <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 gap-y-10 px-4 md:px-6 pt-6">
+                <!-- Skeletons will be rendered here by JS -->
+            </div>
+            
+            <div id="error-container" class="w-full hidden flex-col items-center justify-center py-20 text-yt-muted">
+                <svg class="w-24 h-24 mb-4 opacity-50" viewBox="0 0 24 24" fill="currentColor"><path d="M11 15h2v2h-2zm0-8h2v6h-2zm.99-5C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"></path></svg>
+                <p class="text-lg">Something went wrong.</p>
+                <button onclick="fetchVideos()" class="mt-4 px-4 py-2 border border-[#3f3f3f] rounded-full hover:bg-yt-hover transition">Try again</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bottom Navigation (Mobile) -->
+    <div class="sm:hidden fixed bottom-0 w-full bg-yt-header flex justify-around items-center py-1 z-20">
+        <a href="#" class="flex flex-col items-center gap-1 p-1 w-full hover:bg-yt-hover rounded-lg">
+            <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M4 21V10.08l8-6.96 8 6.96V21h-6v-6h-4v6H4z"></path></svg>
+            <span class="text-[10px] text-white font-medium">Home</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-1 p-1 w-full hover:bg-yt-hover rounded-lg">
+            <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M10 14.65v-5.3L15 12l-5 2.65zm7.77-4.33-1.2-.5L18 9.06c1.84-.96 2.53-3.23 1.56-5.06s-3.24-2.53-5.07-1.56L6 6.94c-1.29.68-2.07 2.04-2 3.49.06 1.42.94 2.66 2.25 3.16.32.12.72.26 1.14.4l-1.2.49c-1.84.96-2.53 3.23-1.56 5.06s3.24 2.53 5.07 1.56l8.5-4.5c1.29-.68 2.06-2.04 1.99-3.49-.06-1.42-.94-2.66-2.25-3.16l-1.15-.4zM14.07 21l-8.5-4.5c-1.34-.71-1.85-2.34-1.14-3.68.71-1.35 2.34-1.86 3.68-1.15l1.83.76.35.15-.17-.36-1.14-2.43-.15-.31.32-.12c.98-.38 1.63-1.28 1.65-2.32.02-1.04-.6-1.98-1.55-2.4l-1.84-.81L6.96 8.33c-1.34-.71-1.85-2.34-1.14-3.68.71-1.35 2.34-1.86 3.68-1.15l8.5 4.5c1.34.71 1.85 2.34 1.14 3.68-.71 1.35-2.34 1.86-3.68 1.15l-1.83-.76-.35-.15.17.36 1.14 2.43.15.31-.32.12c-.98.38-1.63 1.28-1.65 2.32-.02 1.04.6 1.98 1.55 2.4l1.84.81 1.44-.61c1.34.71 1.85 2.34 1.14 3.68-.71 1.35-2.34 1.86-3.68 1.15z"></path></svg>
+            <span class="text-[10px] text-white">Shorts</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-1 p-1 w-full">
+            <svg class="w-10 h-10 fill-white hover:fill-[#e0e0e0] transition-colors" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"></path></svg>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-1 p-1 w-full hover:bg-yt-hover rounded-lg">
+            <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24"><path d="M10 18v-6l5 3-5 3zm7-15H7v1h10V3zm3 3H4v1h16V6zm2 3H2v12h20V9zM3 10h18v10H3V10z"></path></svg>
+            <span class="text-[10px] text-white">Subscriptions</span>
+        </a>
+        <a href="#" class="flex flex-col items-center gap-1 p-1 w-full hover:bg-yt-hover rounded-lg">
+            <div class="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center font-semibold text-xs overflow-hidden">
+                U
+            </div>
+            <span class="text-[10px] text-white">You</span>
+        </a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
