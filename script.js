@@ -1,6 +1,17 @@
 const API_URL = "https://api.freeapi.app/api/v1/public/youtube/videos";
 const videoGrid = document.getElementById("video-grid");
 const errorContainer = document.getElementById("error-container");
+const loadMoreTrigger = document.getElementById("load-more-trigger");
+const loadMoreStatus = document.getElementById("load-more-status");
+const loadMoreButton = document.getElementById("load-more-button");
+
+const paginationState = {
+    page: 1,
+    totalPages: 1,
+    isLoading: false,
+    hasMore: true,
+    videos: []
+};
 
 function escapeHtml(value = "") {
     return String(value)
@@ -73,8 +84,8 @@ function normalizeVideos(responseData) {
         .filter((video) => video && typeof video === "object");
 }
 
-function renderSkeletons() {
-    videoGrid.innerHTML = Array.from({ length: 10 }, () => `
+function createSkeletonMarkup(count = 10) {
+    return Array.from({ length: count }, () => `
         <div class="flex flex-col gap-3 mb-8 sm:mb-2 cursor-pointer w-full">
             <div class="relative w-full aspect-video rounded-none sm:rounded-xl bg-[#272727] animate-pulse"></div>
             <div class="flex gap-3 px-4 sm:px-0">
@@ -86,14 +97,66 @@ function renderSkeletons() {
             </div>
         </div>
     `).join("");
+}
+
+function renderInitialSkeletons() {
+    videoGrid.innerHTML = createSkeletonMarkup();
 
     videoGrid.classList.remove("hidden");
     errorContainer.classList.add("hidden");
 }
 
+function renderLoadMoreSkeletons() {
+    videoGrid.insertAdjacentHTML("beforeend", createSkeletonMarkup(5));
+}
+
+function removeTrailingSkeletons() {
+    const skeletons = Array.from(videoGrid.children).filter((element) =>
+        element.querySelector(".animate-pulse")
+    );
+
+    skeletons.forEach((element) => element.remove());
+}
+
+function setLoadMoreStatus(message = "", hidden = false) {
+    if (!loadMoreStatus) return;
+
+    loadMoreStatus.textContent = message;
+    loadMoreStatus.classList.toggle("hidden", hidden);
+}
+
+function updateLoadMoreControls() {
+    if (!loadMoreTrigger || !loadMoreButton) {
+        return;
+    }
+
+    loadMoreTrigger.classList.remove("hidden");
+    loadMoreButton.disabled = paginationState.isLoading || !paginationState.hasMore;
+    loadMoreButton.classList.toggle("opacity-50", loadMoreButton.disabled);
+    loadMoreButton.classList.toggle("cursor-not-allowed", loadMoreButton.disabled);
+
+    if (paginationState.isLoading) {
+        loadMoreButton.textContent = "Loading...";
+        setLoadMoreStatus("Fetching more videos...", false);
+        return;
+    }
+
+    if (!paginationState.hasMore) {
+        loadMoreButton.textContent = "No more videos";
+        setLoadMoreStatus("You have reached the end.", false);
+        return;
+    }
+
+    loadMoreButton.textContent = "Load more";
+    setLoadMoreStatus("", true);
+}
+
 function renderError(message) {
     videoGrid.classList.add("hidden");
     errorContainer.classList.remove("hidden");
+    if (loadMoreTrigger) {
+        loadMoreTrigger.classList.add("hidden");
+    }
 
     const errorText = errorContainer.querySelector("p");
     if (errorText) {
@@ -101,12 +164,16 @@ function renderError(message) {
     }
 }
 
-function renderVideos(videos) {
+function renderVideos(videos, { append = false } = {}) {
     videoGrid.classList.remove("hidden");
     errorContainer.classList.add("hidden");
+    if (loadMoreTrigger) {
+        loadMoreTrigger.classList.remove("hidden");
+    }
 
     if (!videos.length) {
         videoGrid.innerHTML = '<div class="col-span-full text-center text-yt-muted py-10">No videos found.</div>';
+        updateLoadMoreControls();
         return;
     }
 
@@ -120,7 +187,7 @@ function renderVideos(videos) {
         "bg-indigo-600"
     ];
 
-    videoGrid.innerHTML = videos.map((video) => {
+    const markup = videos.map((video) => {
         const snippet = video.snippet || {};
         const details = video.contentDetails || {};
         const stats = video.statistics || {};
@@ -171,13 +238,50 @@ function renderVideos(videos) {
             </a>
         `;
     }).join("");
+
+    if (append) {
+        videoGrid.insertAdjacentHTML("beforeend", markup);
+        return;
+    }
+
+    videoGrid.innerHTML = markup;
 }
 
-async function fetchVideos() {
-    try {
-        renderSkeletons();
+function updatePagination(responseData, videos) {
+    const pageData = responseData?.data || {};
+    paginationState.page = pageData.page || paginationState.page;
+    paginationState.totalPages = pageData.totalPages || paginationState.totalPages;
+    paginationState.hasMore =
+        Boolean(pageData.nextPage) && paginationState.page < paginationState.totalPages;
+    paginationState.videos = paginationState.videos.concat(videos);
 
-        const response = await fetch(API_URL, {
+    if (!videos.length) {
+        paginationState.hasMore = false;
+    }
+}
+
+async function fetchVideos(page = 1) {
+    if (paginationState.isLoading) {
+        return;
+    }
+
+    try {
+        paginationState.isLoading = true;
+
+        if (page === 1) {
+            paginationState.videos = [];
+            paginationState.page = 1;
+            paginationState.totalPages = 1;
+            paginationState.hasMore = true;
+            renderInitialSkeletons();
+            setLoadMoreStatus("", true);
+        } else {
+            renderLoadMoreSkeletons();
+        }
+
+        updateLoadMoreControls();
+
+        const response = await fetch(`${API_URL}?page=${page}`, {
             method: "GET",
             headers: {
                 Accept: "application/json"
@@ -195,12 +299,36 @@ async function fetchVideos() {
             throw new Error(responseData?.message || "API request failed");
         }
 
-        renderVideos(videos);
+        removeTrailingSkeletons();
+        updatePagination(responseData, videos);
+        renderVideos(videos, { append: page > 1 });
+        updateLoadMoreControls();
     } catch (error) {
         console.error("Error fetching videos:", error);
+        removeTrailingSkeletons();
         renderError("Videos could not be loaded. If you opened this file directly, run it with Live Server.");
+    } finally {
+        paginationState.isLoading = false;
+        updateLoadMoreControls();
     }
 }
 
+function setupLoadMoreButton() {
+    if (!loadMoreButton) {
+        return;
+    }
+
+    loadMoreButton.addEventListener("click", () => {
+        if (paginationState.isLoading || !paginationState.hasMore) {
+            return;
+        }
+
+        fetchVideos(paginationState.page + 1);
+    });
+}
+
 window.fetchVideos = fetchVideos;
-document.addEventListener("DOMContentLoaded", fetchVideos);
+document.addEventListener("DOMContentLoaded", () => {
+    setupLoadMoreButton();
+    fetchVideos(1);
+});

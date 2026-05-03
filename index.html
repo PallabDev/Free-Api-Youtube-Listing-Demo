@@ -106,7 +106,7 @@
         </div>
     </header>
 
-    <div class="flex flex-1 mt-14 overflow-hidden">
+    <div class="flex flex-1 mt-14 overflow-hidden min-h-0">
         <!-- Sidebar -->
         <aside class="w-[72px] lg:w-[240px] flex-shrink-0 flex flex-col bg-yt-sidebar overflow-y-auto hover:overflow-y-scroll pb-4 px-3 hidden sm:flex">
             <div class="flex flex-col mt-3 w-full">
@@ -165,7 +165,7 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto bg-yt-black relative pb-20 sm:pb-0">
+        <main id="main-content" class="flex-1 min-h-0 overflow-y-auto bg-yt-black relative pb-20 sm:pb-0">
             <!-- Categories -->
             <div class="sticky top-0 bg-yt-black bg-opacity-95 backdrop-blur-sm z-10 py-3 px-4 md:px-6 flex gap-3 overflow-x-auto no-scrollbar border-b border-transparent">
                 <button class="px-3 py-1.5 bg-white text-black rounded-lg text-sm font-medium whitespace-nowrap">All</button>
@@ -181,6 +181,15 @@
             <!-- Video Grid -->
             <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-x-4 gap-y-10 px-4 md:px-6 pt-6">
                 <!-- Skeletons will be rendered here by JS -->
+            </div>
+
+            <div id="load-more-trigger" class="px-4 md:px-6 py-6">
+                <div class="flex flex-col items-center gap-3">
+                    <button id="load-more-button" class="px-5 py-2.5 rounded-full border border-[#3f3f3f] bg-[#272727] text-white text-sm font-medium hover:bg-[#3a3a3a] transition">
+                        Load more
+                    </button>
+                    <p id="load-more-status" class="hidden text-center text-sm text-yt-muted">Fetching more videos...</p>
+                </div>
             </div>
             
             <div id="error-container" class="w-full hidden flex-col items-center justify-center py-20 text-yt-muted">
